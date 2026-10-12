@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zfarm Water Monitor — Prototype</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--panel2:#17243a;--line:#293a52;--text:#edf4ff;--muted:#9fb0c8;--green:#42d392;--yellow:#f6c85f;--red:#ff7777;--blue:#6ab8ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#0b1220,#101b2c);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1120px;margin:auto;padding:22px}.top{display:flex;gap:18px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:48px;height:48px;border-radius:14px;background:#173f39;display:grid;place-items:center;font-size:25px}
+h1{font-size:clamp(22px,4vw,32px);margin:0;letter-spacing:-.6px}h2{font-size:17px;margin:0 0 12px}.sub{color:var(--muted);margin-top:3px}.pill{border:1px solid #315844;background:#133329;color:#8ff0c0;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:700}
+.actions{display:flex;gap:8px;flex-wrap:wrap}button{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 13px;border-radius:10px;cursor:pointer;font-weight:650}button.primary{background:#187657;border-color:#23956e}button:hover{filter:brightness(1.12)}
+.notice{padding:12px 14px;background:#30291b;border:1px solid #65532a;border-radius:12px;color:#ffe6a5;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:rgba(18,29,48,.95);border:1px solid var(--line);border-radius:16px;padding:17px;min-width:0}.metric-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.metric-name{font-weight:700}.unit{font-size:12px;color:var(--muted)}.value{font-size:32px;font-weight:800;letter-spacing:-1px;margin:15px 0 4px}.status{font-size:12px;font-weight:750;color:var(--green)}.status.warn{color:var(--yellow)}.status.bad{color:var(--red)}.bar{height:5px;border-radius:5px;background:#27354a;margin-top:15px;overflow:hidden}.bar span{display:block;height:100%;background:var(--green);width:50%}
+.lower{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-top:14px}.chart{width:100%;height:205px;display:block}.chart-label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.legend{display:flex;gap:14px;color:var(--muted);font-size:12px;margin-top:8px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:10px 4px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}td:last-child,th:last-child{text-align:right}.foot{color:var(--muted);font-size:12px;margin:18px 2px}.state{color:var(--muted);font-size:12px;margin-top:10px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lower{grid-template-columns:1fr}.wrap{padding:14px}.value{font-size:27px}}
+@media(max-width:430px){.grid{grid-template-columns:1fr 1fr;gap:9px}.card{padding:13px}.value{font-size:24px}.metric-name{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">🐟</div><div><h1>Zfarm Water Monitor</h1><div class="sub">Pemantauan kualitas air bioflok · Kolam uji coba 01</div></div></div>
+    <div class="actions"><span class="pill">● MODE SIMULASI</span><button id="refresh">Simulasikan pembacaan</button></div>
+  </header>
+  <div class="notice"><strong>Mode demo:</strong> angka di bawah ini data simulasi untuk menguji tampilan. Bukan hasil pengukuran kolam dan jangan dipakai untuk mengambil keputusan budidaya.</div>
+  <section class="grid" id="metrics">
+    <article class="card"><div class="metric-head"><span class="metric-name">pH</span><span class="unit">skala 0–14</span></div><div class="value" id="ph">7.1</div><div class="status" id="phs">SIMULASI</div><div class="bar"><span id="phb"></span></div></article>
+    <article class="card"><div class="metric-head"><span class="metric-name">DO</span><span class="unit">mg/L</span></div><div class="value" id="do">5.8</div><div class="status" id="dos">SIMULASI</div><div class="bar"><span id="dob"></span></div></article>
+    <article class="card"><div class="metric-head"><span class="metric-name">TDS</span><span class="unit">ppm · perkiraan</span></div><div class="value" id="tds">820</div><div class="status" id="tdss">SIMULASI</div><div class="bar"><span id="tdsb"></span></div></article>
+    <article class="card"><div class="metric-head"><span class="metric-name">Amonia</span><span class="unit">mg/L</span></div><div class="value" id="nh3">0.20</div><div class="status" id="nh3s">SIMULASI</div><div class="bar"><span id="nh3b"></span></div></article>
+    <article class="card"><div class="metric-head"><span class="metric-name">Nitrit</span><span class="unit">mg/L</span></div><div class="value" id="no2">0.10</div><div class="status" id="no2s">SIMULASI</div><div class="bar"><span id="no2b"></span></div></article>
+    <article class="card"><div class="metric-head"><span class="metric-name">Nitrat</span><span class="unit">mg/L</span></div><div class="value" id="no3">20</div><div class="status" id="no3s">SIMULASI</div><div class="bar"><span id="no3b"></span></div></article>
+  </section>
+  <section class="lower">
+    <article class="card"><h2>Riwayat pembacaan simulasi</h2><div class="chart-label"><span>Data demo terakhir</span><span id="updated">Belum diperbarui</span></div><svg class="chart" id="chart" viewBox="0 0 600 210" preserveAspectRatio="none" aria-label="Grafik simulasi pH"><g stroke="#293a52" stroke-width="1"><path d="M35 25H585 M35 65H585 M35 105H585 M35 145H585 M35 185H585"/></g><polyline id="line" points="35,110 95,95 155,120 215,82 275,91 335,70 395,90 455,65 515,80 585,60" fill="none" stroke="#6ab8ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><g fill="#9fb0c8" font-size="11"><text x="3" y="29">14</text><text x="8" y="109">7</text><text x="8" y="189">0</text></g></svg><div class="legend"><span><i class="dot"></i>pH (simulasi)</span><span>Grafik contoh, bukan data aktual</span></div></article>
+    <article class="card"><h2>Status sistem</h2><table><tbody><tr><td>ESP32</td><td id="espstate">Belum terhubung</td></tr><tr><td>Sensor analog</td><td>Mode demo</td></tr><tr><td>Analyzer kimia</td><td>Belum dipasang</td></tr><tr><td>Reagen</td><td>Belum dipasang</td></tr></tbody></table><h2 style="margin-top:18px">Aktivitas terakhir</h2><div id="activity" class="sub">Dashboard demo berhasil dibuka.</div><div class="state">Tahap berikutnya: pilih sensor fisik, lalu hubungkan data ESP32.</div></article>
+  </section>
+  <div class="foot">Zfarm Water Monitor · Prototype v0.1 · Dashboard lokal demo</div>
+</div>
+<script>
+const rnd=(a,b,d=1)=>+(Math.random()*(b-a)+a).toFixed(d);
+function update(){
+ const vals={ph:rnd(6.6,7.8),do:rnd(4.2,7.2),tds:Math.round(rnd(650,1100,0)),nh3:rnd(.05,.5,2),no2:rnd(.02,.3,2),no3:rnd(10,45,0)};
+ for(const [k,v] of Object.entries(vals)){document.getElementById(k).textContent=v;document.getElementById(k+'s').textContent='SIMULASI · BUKAN DATA SENSOR';}
+ document.getElementById('updated').textContent=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ document.getElementById('activity').textContent='Data simulasi diperbarui. Tidak ada sensor fisik yang dibaca.';
+ const ys=Array.from({length:10},()=>rnd(65,145,0));document.getElementById('line').setAttribute('points',ys.map((y,i)=>`${35+i*(550/9)},${y}`).join(' '));
+ document.getElementById('phb').style.width=(vals.ph/14*100)+'%';document.getElementById('dob').style.width=(vals.do/10*100)+'%';document.getElementById('tdsb').style.width=Math.min(vals.tds/1500*100,100)+'%';document.getElementById('nh3b').style.width=Math.min(vals.nh3/1*100,100)+'%';document.getElementById('no2b').style.width=Math.min(vals.no2/1*100,100)+'%';document.getElementById('no3b').style.width=Math.min(vals.no3/100*100,100)+'%';
+}
+document.getElementById('refresh').addEventListener('click',update);
+</script>
+</body>
+</html>
